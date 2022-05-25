@@ -3,9 +3,6 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../Models/User");
-const mongoose = require('mongoose')
-
-const ObjectId = mongoose.Types.ObjectId;
 
 
 router.post("/register", async (req, res) => {
@@ -20,9 +17,9 @@ router.post("/register", async (req, res) => {
             username: req.body.username,
             password: hashedPassword,
         }).save()
-        console.log(newUser);
-        res.json(newUser)
 
+        const accessToken = jwt.sign((newUser).toJSON(), process.env.TOKEN_SECRET, { expiresIn: '3d' })
+        res.json({ accessToken: accessToken, user: newUser })
 
     } catch (error) {
         console.log(error);
@@ -43,9 +40,9 @@ router.post('/login', async (req, res) => {
         const passwordMatches = await bcrypt.compare(req.body.password, user.password)
         if (passwordMatches) {
             console.log(user);
-            const accessToken = jwt.sign((user).toJSON(), process.env.TOKEN_SECRET, { expiresIn: '30m' })
+            const accessToken = jwt.sign((user).toJSON(), process.env.TOKEN_SECRET, { expiresIn: '30d' })
             console.log(accessToken);
-            res.json(accessToken)
+            res.json({ accessToken: accessToken, user: user })
         }
         else {
             res.status(400).json({ message: "Invalid credentials" });
@@ -59,29 +56,29 @@ router.post('/login', async (req, res) => {
 
 })
 
-router.get("/:id", async (req, res) => {
+// router.get("/:id", async (req, res) => {
 
-    try {
+//     try {
 
-        if (req.params.id) {
+//         if (req.params.id) {
 
-            const user = await User.aggregate(
-                [{ $match: { _id: ObjectId('628ca3189c2617df6b5603af') } },
+//             const user = await User.aggregate(
+//                 [{ $match: { _id: ObjectId('628ca3189c2617df6b5603af') } },
 
-                ]
-            )
-            console.log(user);
-            res.send(user);
-        }
+//                 ]
+//             )
+//             console.log(user);
+//             res.send(user);
+//         }
 
-        let users = await User.find();
-        console.log(users);
-        // res.send(users);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "internal server error" });
-    }
+//         let users = await User.find();
+//         console.log(users);
+//         // res.send(users);
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json({ message: "internal server error" });
+//     }
 
-});
+// });
 
 module.exports = router

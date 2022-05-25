@@ -4,6 +4,7 @@ const router = express.Router();
 const OneSpend = require('../Models/oneSpend')
 const mongoose = require('mongoose')
 const ObjectId = mongoose.Types.ObjectId;
+const jwt = require('jsonwebtoken')
 
 
 const authJWT = (req, res, next) => {
@@ -14,7 +15,9 @@ const authJWT = (req, res, next) => {
             if (err) {
                 return res.status(403).send(err.message);
             }
-            // req.user = user;
+            // console.log(user);
+            // console.log(req);
+            req.user = user;
             next();
         });
     } else {
@@ -23,7 +26,7 @@ const authJWT = (req, res, next) => {
 };
 
 router.get("/detailsByMonth/:year/:month/:id",
-    //  authJWT,
+    authJWT,
     async (req, res) => {
 
         try {
@@ -47,7 +50,7 @@ router.get("/detailsByMonth/:year/:month/:id",
 
 
 router.get("/amountByMonth/:year/:month/:id",
-    //  authJWT,
+    authJWT,
     async (req, res) => {
 
         try {
@@ -74,7 +77,7 @@ router.get("/amountByMonth/:year/:month/:id",
 
 
 router.get("/detailsByYear/:year/:id",
-    //  authJWT,
+    authJWT,
     async (req, res) => {
 
         try {
@@ -97,7 +100,7 @@ router.get("/detailsByYear/:year/:id",
 
 
 router.get("/amountByYear/:year/:id",
-    //  authJWT,
+    authJWT,
     async (req, res) => {
 
         try {
@@ -110,7 +113,7 @@ router.get("/amountByYear/:year/:id",
                     }
                 },
                 {
-                    $group: { _id: { month: "$year" }, total: { $sum: "$amount" } },// thsum amount by month
+                    $group: { _id: { year: "$year" }, total: { $sum: "$amount" } },// thsum amount by month
                 },
                 ]
             )
@@ -148,7 +151,6 @@ router.post("/", async (req, res) => {
 }
 
 )
-
 
 router.get("/:id", async (req, res) => {
 
