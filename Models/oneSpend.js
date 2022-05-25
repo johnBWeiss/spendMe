@@ -10,17 +10,17 @@ const spendOneSchema = new mongoose.Schema({
         required: true
     },
     month: {
-        type: String,
+        type: Number,
         required: true
     },
     year: {
-        type: String,
+        type: Number,
         required: true
     },
     createdBy: {
         type: mongoose.SchemaTypes.ObjectId,
         ref: "User",
-        // required: true
+        required: true
     },
 
     category: { type: String, required: true }

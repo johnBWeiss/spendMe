@@ -19,8 +19,6 @@ app.get('/', (req, res) => {
 })
 
 
-
-
-
 DbConnect();
+
 app.listen(process.env.PORT, () => console.log(`listening at ${process.env.PORT}`))
