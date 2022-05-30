@@ -2,6 +2,8 @@ const express = require("express");
 const res = require("express/lib/response");
 const router = express.Router();
 const OneSpend = require('../Models/oneSpend')
+const monthModel = require('../Models/month')
+
 const mongoose = require('mongoose')
 const ObjectId = mongoose.Types.ObjectId;
 const jwt = require('jsonwebtoken')
@@ -15,8 +17,6 @@ const authJWT = (req, res, next) => {
             if (err) {
                 return res.status(403).send(err.message);
             }
-            // console.log(user);
-            // console.log(req);
             req.user = user;
             next();
         });
@@ -28,9 +28,8 @@ const authJWT = (req, res, next) => {
 router.get("/detailsByMonth/:year/:month/:id",
     authJWT,
     async (req, res) => {
-        console.log(req.params.month, req.params.id, req.params.year);
         try {
-            const month = await OneSpend.find(
+            const month = await monthModel.find(
                 {
                     month: Number(req.params.month),//TODO i might not need the Number
                     createdBy: (req.params.id),
@@ -172,18 +171,10 @@ router.get("/:id", async (req, res) => {
 
 
 router.post("/item/:year/:month/:id/:category/:amount", authJWT, async (req, res) => {
-    console.log('in post');
 
     try {
 
-        const body = {
-            month: Number(req.params.month),//TODO i might not need the Number
-            createdBy: (req.params.id),
-            year: Number(req.params.year),
-            category: (req.params.category)
-        };
-
-        const checkCategory = await OneSpend.findOneAndUpdate({
+        const checkCategory = await monthModel.findOneAndUpdate({
             month: Number(req.params.month),//TODO i might not need the Number
             createdBy: (req.params.id),
             year: Number(req.params.year),
@@ -192,15 +183,14 @@ router.post("/item/:year/:month/:id/:category/:amount", authJWT, async (req, res
             $inc: { amount: req.params.amount }
         })
 
-        console.log(checkCategory);
 
         if (!checkCategory) {
-            const newSpend = await new OneSpend({ ...req.body }).save();
+            const newSpend = await new monthModel({ ...req.body }).save();
             console.log(newSpend);
         }
 
         try {
-            const month = await OneSpend.find(
+            const month = await monthModel.find(
                 {
                     month: Number(req.params.month),//TODO i might not need the Number
                     createdBy: (req.params.id),

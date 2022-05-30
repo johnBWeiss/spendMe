@@ -3,7 +3,7 @@ const app = express();
 const cors = require('cors')
 const bodyParser = require('body-parser');
 const DbConnect = require('./dataBase/DbConnect')
-const { oneSpendRoute, usersRoute } = require('./Routes/router')
+const { oneSpendRoute, usersRoute, monthRoute } = require('./Routes/router')
 
 require('dotenv/config');
 
@@ -12,6 +12,8 @@ app.use(bodyParser.json());
 
 app.use('/oneSpend', oneSpendRoute);
 app.use('/user', usersRoute)
+app.use('/month', monthRoute)
+
 
 
 app.get('/', (req, res) => {

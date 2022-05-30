@@ -7,20 +7,21 @@ const User = require("../Models/User");
 
 router.post("/register", async (req, res) => {
     try {
+        console.log(req.body.password, req.body.username);
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const userAlreadyExists = await User.findOne({ username: req.body.username });
         if (userAlreadyExists) {
             res.status(401).send('user already exists')
         }
+        else {
+            const newUser = await new User({
+                username: req.body.username,
+                password: hashedPassword,
+            }).save()
 
-        const newUser = await new User({
-            username: req.body.username,
-            password: hashedPassword,
-        }).save()
-
-        const accessToken = jwt.sign((newUser).toJSON(), process.env.TOKEN_SECRET, { expiresIn: '3d' })
-        res.json({ accessToken: accessToken, user: newUser })
-
+            const accessToken = jwt.sign((newUser).toJSON(), process.env.TOKEN_SECRET, { expiresIn: '3d' })
+            res.json({ accessToken: accessToken, user: newUser })
+        }
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "internal server error" });
@@ -32,6 +33,9 @@ router.post("/register", async (req, res) => {
 
 
 router.post('/login', async (req, res) => {
+    console.log('in login');
+    console.log(req.body.username);
+    console.log(req.body.password);
 
     try {
 
@@ -45,6 +49,7 @@ router.post('/login', async (req, res) => {
             res.json({ accessToken: accessToken, user: user })
         }
         else {
+            console.log("TODO find problem");
             res.status(400).json({ message: "Invalid credentials" });
 
         }
